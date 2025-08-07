@@ -1,12 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-      res.send().statusCode(200);
-});
+const feedbackController = require('../controllers/feedback.controller.js');
 
-router.post('/', (req, res) => {
-      res.send().statusCode(200);
-});
+router.get('/', feedbackController.getAllFeedback);
+
+router.post('/', feedbackController.createFeedback);
 
 module.exports = router;
