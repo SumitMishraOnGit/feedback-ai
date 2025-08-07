@@ -9,3 +9,5 @@
 client/.env
 server/.env
 widget/.env
+
+/FUTURE-UPDATE.md
