@@ -3,32 +3,54 @@ const Feedback = require('../models/Feedback.Model.js');
 
 exports.createFeedback = async (req, res) => {
   try {
-  const {content} = req.body
-    if(!content) {
-        res.json({ message: "feedback can't be empty"}).status(200)
-    } 
+    const { content } = req.body;
+
+    // Validation with proper return to stop execution
+    if (!content || content.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: "Feedback content is required"
+      });
+    }
+
     const newFeedback = new Feedback({
-        content: content,
-    })
+      content: content.trim(),
+    });
 
     await newFeedback.save();
-    res.status.json(newFeedback)
 
-  } catch(error) {
-    console.log(error)
-    res.status(500).json({ message: 'Server error while creating feedback.' });
+    // Fixed: res.status(201).json() - 201 for resource creation
+    return res.status(201).json({
+      success: true,
+      message: "Feedback submitted successfully",
+      data: newFeedback
+    });
+
+  } catch (error) {
+    console.error("Error creating feedback:", error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while creating feedback.'
+    });
   }
-
 };
 
-exports.getAllFeedback = async function (req, res) {
+exports.getAllFeedback = async (req, res) => {
   try {
-    const allFeedback = await Feedback.find({}).sort({createdAt: -1});
+    const allFeedback = await Feedback.find({}).sort({ createdAt: -1 });
 
-    res.json(allFeedback).status(200)
+    // Fixed: status() before json()
+    return res.status(200).json({
+      success: true,
+      count: allFeedback.length,
+      data: allFeedback
+    });
   } catch (error) {
-    console.log( "Error while fetching all feedbacks:", error )
-    res.status(500).json({ message: 'Server error while fetching feedback.' });
+    console.error("Error while fetching all feedbacks:", error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while fetching feedback.'
+    });
   }
-}
+};
 

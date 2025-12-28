@@ -1,20 +1,31 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const feedbackRoutes = require('./routes/Feedback.Route.js');
-const port = 5001;
 require("dotenv").config();
 
+const port = process.env.PORT || 5001;
 const app = express();
 
-app.use("/api/feedback", feedbackRoutes);
-app.use(express.json());
+// ===== Middleware (ORDER MATTERS!) =====
+app.use(cors());           // Enable CORS for frontend requests
+app.use(express.json());   // Parse JSON bodies BEFORE routes
 
-// MongoDB Connection
+// ===== Routes =====
+app.use("/api/feedback", feedbackRoutes);
+
+// ===== Health Check =====
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// ===== MongoDB Connection =====
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
+// ===== Start Server =====
 app.listen(port, () => {
-      console.log(`listening on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
